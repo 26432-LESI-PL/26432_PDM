@@ -12,9 +12,12 @@ import java.net.URL
 class NewsAPI(private val apiKey: String) {
     private val baseUrl = "https://newsapi.org/v2"
 
-    suspend fun getTopHeadlines(country: String): List<NewsItem> {
+    suspend fun getTopHeadlines(country: String, page: Int = 1): List<NewsItem> {
         return withContext(Dispatchers.IO) {
             val urlString = "$baseUrl/top-headlines?country=$country&apiKey=$apiKey"
+            if (page > 1) {
+                urlString.plus("&page=$page")
+            }
             Log.d("NewsAPI", "Request URL: $urlString")
             val url = URL(urlString)
             val connection = url.openConnection() as HttpURLConnection
@@ -45,9 +48,12 @@ class NewsAPI(private val apiKey: String) {
     }
 
     // Latest news from the API
-    suspend fun searchNews(query: String = "apple"): List<NewsItem> {
+    suspend fun searchNews(query: String, page: Int = 1): List<NewsItem> {
         return withContext(Dispatchers.IO) {
             val urlString = "$baseUrl/everything?apiKey=$apiKey&q=$query"
+            if (page > 1) {
+                urlString.plus("&page=$page")
+            }
             Log.d("NewsAPI", "Request URL: $urlString")
             val url = URL(urlString)
             val connection = url.openConnection() as HttpURLConnection
@@ -78,9 +84,7 @@ class NewsAPI(private val apiKey: String) {
     }
     // Parse the JSON response from the API
 
-    data class NewsItem(val title: String, val imageUrl: String, val journal: String, val url: String) {
-
-    }
+    data class NewsItem(val title: String, val imageUrl: String, val journal: String, val url: String)
 
     private fun parseHeadlines(jsonResponse: String): List<NewsItem> {
         val headlines = mutableListOf<NewsItem>()

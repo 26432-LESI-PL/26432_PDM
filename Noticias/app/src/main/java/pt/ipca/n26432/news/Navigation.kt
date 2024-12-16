@@ -36,18 +36,29 @@ sealed class BottomNavItem(
             "search"
         )
 
-    data object List :
-        BottomNavItem(
-            "Favorites",
-            Icons.Filled.Favorite,
-            "favorites"
-        )
-
-    data object Analytics :
+    data object Me :
         BottomNavItem(
             "Me",
             Icons.Filled.Face,
             "me"
+        )
+    data object Login :
+        BottomNavItem(
+            "",
+            Icons.Filled.Face,
+            "login"
+        )
+    data object LoggedIn :
+        BottomNavItem(
+            "",
+            Icons.Filled.Favorite,
+            "loggedin"
+        )
+    data object Favorite :
+        BottomNavItem(
+            "Favorites",
+            Icons.Filled.Favorite,
+            "favorites"
         )
 }
 
@@ -56,8 +67,7 @@ fun BottomNavigation(navController: NavController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Search,
-        BottomNavItem.List,
-        BottomNavItem.Analytics,
+        BottomNavItem.Me,
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -91,7 +91,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
                                 display = newDisplay
                                 lastButtonWasEquals = wasEquals
                             } },
-                            modifier = Modifier.weight(1f).height(64.dp),
+                            modifier = Modifier.weight(1f).height(80.dp),
                         ) {
                             Text(text = label)
                         }

@@ -1,16 +1,14 @@
-package pt.ipca.n26432.news
+package pt.ipca.n26432.news.screen
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,13 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
-import org.json.JSONObject
+import pt.ipca.n26432.news.NewsAPI
 
+
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun MainScreen(innerPadding: PaddingValues) {
@@ -46,7 +49,9 @@ fun MainScreen(innerPadding: PaddingValues) {
     val headlines = remember { mutableStateOf<List<NewsAPI.NewsItem>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
+    val firestore = FirebaseFirestore.getInstance()
+    val auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -57,12 +62,11 @@ fun MainScreen(innerPadding: PaddingValues) {
 
     LazyColumn(modifier = Modifier.padding(innerPadding)) {
         items(headlines.value) { headline ->
+            val isFavorite = remember { mutableStateOf(false) }
             Card(modifier = Modifier.padding(vertical = 8.dp), onClick = {
-                // open the news on the browser
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(headline.url))
                 context.startActivity(intent)
-            }
-            ) {
+            }) {
                 Row(modifier = Modifier.padding(16.dp)) {
                     Box(modifier = Modifier
                         .size(100.dp)
@@ -82,7 +86,24 @@ fun MainScreen(innerPadding: PaddingValues) {
                         Text(text = headline.title, style = MaterialTheme.typography.titleMedium)
                         Text(text = headline.journal, style = MaterialTheme.typography.titleSmall)
                     }
-                    IconButton(onClick = { /* Handle favorite click */ }) {
+                    IconButton(onClick = {
+                        if (currentUser == null) {
+                            return@IconButton
+                        }
+                        isFavorite.value = true
+                        val favorite = hashMapOf(
+                            "name" to headline.title,
+                            "author" to headline.journal,
+                            "image" to Base64.encodeToString(headline.imageUrl.toByteArray(), Base64.DEFAULT),
+                            "url" to headline.url,
+                            "userId" to (currentUser.uid),
+                        )
+                        firestore.collection("favorites").add(favorite)
+                    },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = if (isFavorite.value) Color.Red else Color.White
+                        )
+                    ) {
                         Icon(imageVector = Icons.Default.Favorite, contentDescription = "Favorite")
                     }
                 }
