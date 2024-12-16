@@ -1,4 +1,4 @@
-name: Android CI
+name: Calculator Android CI
 
 on:
   push:
