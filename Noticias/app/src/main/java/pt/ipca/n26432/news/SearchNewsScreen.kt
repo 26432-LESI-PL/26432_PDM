@@ -53,9 +53,14 @@ fun SearchNewsScreen(innerPadding: PaddingValues) {
         debounceJob.value?.cancel()
         debounceJob.value = coroutineScope.launch {
             delay(500) // 500ms debounce time
+            if (searchQuery.value.isEmpty()) {
+                headlines.value = emptyList()
+                return@launch
+            }
             val news = newsAPI.searchNews(searchQuery.value)
             headlines.value = news
             firstTime.value = false
+
         }
     }
 

@@ -52,7 +52,7 @@ class NewsAPI(private val apiKey: String) {
             val url = URL(urlString)
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
-            //connection.setRequestProperty("User-Agent", "Mozilla/5.0")
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0")
 
             try {
                 val responseCode = connection.responseCode
