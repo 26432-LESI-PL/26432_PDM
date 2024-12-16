@@ -49,7 +49,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-// Screen
 @Composable
 fun CalculatorScreen(modifier: Modifier = Modifier) {
     var display by remember { mutableStateOf("0") }
