@@ -3,11 +3,11 @@ name: Calculator Android CI
 on:
   push:
     paths:
-      - 'calculator'
+      - 'calculator/**'
     branches: [ "main" ]
   pull_request:
     paths:
-      - 'calculator'
+      - 'calculator/**'
     branches: [ "main" ]
 
 jobs:
